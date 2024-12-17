@@ -1,0 +1,33 @@
+{
+  "name": "vl-downloader",
+  "workspaces": [
+    "src/backend",
+    "src/frontend"
+  ],
+  "scripts": {
+    "start:be": "npm run start:dev -w backend",
+    "start:fe": "npm run start -w frontend",
+    "build:be": "npm run build -w backend",
+    "build:fe": "npm run build -w frontend",
+    "build:docs": "copy-files-from-to --config docs/copy-files-from-to.json",
+    "build": "npm run build:be && npm run build:fe",
+    "gen:fe": "npm run gen -w frontend",
+    "start": "npm run start:prod -w backend",
+    "docs": "docsify serve ./docs",
+    "deploy:docs": "npm run build:docs && netlify deploy --dir=dist/docs --prod",
+    "release": "npm run build && docker build -t raiper34/vl-downloader:1.0.0 -t raiper34/vl-downloader:latest . && docker push raiper34/vl-downloader:1.0.0 && docker push raiper34/vl-downloader:latest",
+    "commit": "cz"
+  },
+  "devDependencies": {
+    "commitizen": "^4.3.1",
+    "copy-files-from-to": "^3.2.2",
+    "cz-conventional-changelog": "^3.3.0",
+    "docsify-cli": "^4.4.4",
+    "netlify-cli": "^10.5.1"
+  },
+  "config": {
+    "commitizen": {
+      "path": "./node_modules/cz-conventional-changelog"
+    }
+  }
+}

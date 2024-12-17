@@ -1,0 +1,41 @@
+<section class="hero is-danger">
+  <div class="hero-body">
+    <p class="title">
+      <i class="fa-solid fa-gamepad"></i>
+      <span>VL Downloader</span>
+    </p>
+    <p class="subtitle">Self-hosted Vims lair downloader</p>
+  </div>
+</section>
+
+<section class="hero">
+  <div class="hero-body">
+    <p class="subtitle">Download</p>
+    <div class="is-flex">
+      <input class="input" type="text" placeholder="Paste url to rom" [(ngModel)]="url"/>
+      <button class="button is-danger" (click)="processUrl()">
+        <i class="fa-solid fa-download"></i> Download
+      </button>
+    </div>
+    <hr>
+    <div class="is-flex is-justify-content-space-between">
+      <p class="subtitle">Downloads</p>
+      <!-- <div class="buttons has-addons">
+        <button class="button is-outlined is-success" title="Remove completed from list">
+          <i class="fa-solid fa-check"></i>
+        </button>
+        <button class="button is-outlined is-danger" title="Remove failed from list">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div> -->
+    </div>
+
+    <div class="grid is-col-min-10">
+      <div class="cel" *ngFor="let item of all$ | async">
+        <app-rom [rom]="item"></app-rom>
+      </div>
+    </div>
+
+
+  </div>
+</section>

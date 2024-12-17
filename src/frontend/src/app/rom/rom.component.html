@@ -1,0 +1,33 @@
+<div class="card">
+  <div class="card-content">
+    <div class="media">
+      <div class="media-content is-flex is-justify-content-space-between">
+        <p class="title is-4">{{ rom.name ?? rom.url }}</p>
+        <div class="subtitle is-6">
+
+          <div class="dropdown is-hoverable">
+            <div class="dropdown-trigger">
+              <button class="button is-white" aria-haspopup="true" aria-controls="dropdown-menu4">
+                <span class="icon is-small"><i class="fa-solid fa-bars"></i></span>
+              </button>
+            </div>
+            <div class="dropdown-menu" id="dropdown-menu4" role="menu">
+              <div class="dropdown-content">
+                <a *ngIf="rom.url" [href]="rom.url" target="_blank" class="dropdown-item"><i class="fa-solid fa-link"></i> Original link</a>
+                <a *ngIf="isCompleted" href="" target="_blank" class="dropdown-item"><i class="fa-solid fa-download"></i> Download file</a>
+                <a href="" target="_blank" class="dropdown-item"><i class="fa-solid fa-repeat"></i> Retry job</a>
+                <a href="" target="_blank" class="dropdown-item has-text-danger"><i class="fa-solid fa-trash"></i> Remove job</a>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <div class="content">
+      {{ rom.receivedBytes }} / {{ rom.totalBytes }}
+      <progress class="progress is-danger" [value]="percentage" max="100">{{ percentage }}%</progress>
+    </div>
+  </div>
+</div>
