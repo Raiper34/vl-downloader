@@ -26,5 +26,5 @@ RUN rm -rf node_modules
 RUN npm ci --omit=dev
 RUN rm -rf src package.json package-lock.json
 EXPOSE 3000
-CMD ["redis-server"]
+CMD ["redis-server", "--daemonize", "yes"]
 CMD ["node", "backend/src/main.js"]
