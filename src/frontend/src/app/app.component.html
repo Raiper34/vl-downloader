@@ -32,7 +32,7 @@
 
     <div class="grid is-col-min-10">
       <div class="cel" *ngFor="let item of all$ | async">
-        <app-rom [rom]="item"></app-rom>
+        <app-rom [rom]="item" (remove)="remove($event)"></app-rom>
       </div>
     </div>
 

@@ -86,7 +86,7 @@ export class RomService {
         await page.click('#dl_form button');
         this.logger.debug(`Download clicked`);
         try {
-            await page.click('input[value="Continue"]');
+                await page.click('input[value="Continue"]');
         } catch(e) {
             this.logger.debug(`Prompt button not found`);
         }

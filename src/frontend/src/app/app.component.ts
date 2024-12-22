@@ -25,4 +25,8 @@ export class AppComponent {
     this.romService.processUrl(this.url);
     this.url = '';
   }
+
+  remove(id: number): void {
+    this.romService.delete(id);
+  }
 }

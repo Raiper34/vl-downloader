@@ -1,4 +1,4 @@
-import {Component, Input} from '@angular/core';
+import {Component, EventEmitter, Input, Output} from '@angular/core';
 import {CommonModule} from '@angular/common';
 
 @Component({
@@ -10,6 +10,7 @@ import {CommonModule} from '@angular/common';
 export class RomComponent {
 
   @Input() rom: any; // todo fix type
+  @Output() remove: EventEmitter<number> = new EventEmitter();
 
   get isCompleted(): void {
     return this.rom.totalBytes && this.rom.receivedBytes === this.rom.totalBytes
