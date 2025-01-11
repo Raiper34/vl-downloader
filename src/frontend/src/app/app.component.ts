@@ -29,4 +29,12 @@ export class AppComponent {
   remove(id: number): void {
     this.romService.delete(id);
   }
+
+  retry(id: number): void {
+    this.romService.retry(id);
+  }
+
+  trackByFn(_: number, item: any): number {
+    return item.id;
+  }
 }

@@ -48,6 +48,10 @@ export class RomService {
     this.http.delete(`${ENDPOINT}/${id}`).subscribe();
   }
 
+  retry(id: number): void {
+    this.http.get(`${ENDPOINT}/retry/${id}`).subscribe();
+  }
+
   private initWsConnection(): void {
     this.socket.on(WsOperation.Update, (rom: Rom) => this.store.update(upsertEntities(rom)));
     this.socket.on(WsOperation.Delete, ({id}: {id: number}) => this.store.update(deleteEntities(Number(id))));

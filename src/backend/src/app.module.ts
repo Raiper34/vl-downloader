@@ -9,6 +9,7 @@ import { resolve } from 'path';
 import {ConfigModule, ConfigService} from "@nestjs/config";
 import {EnvironmentEnum} from "../environment.enum";
 import {ServeStaticModule} from "@nestjs/serve-static";
+import { SharedModule } from './shared/shared.module';
 
 @Module({
   imports: [
@@ -52,6 +53,7 @@ import {ServeStaticModule} from "@nestjs/serve-static";
       inject: [ConfigService],
     }),
     RomModule,
+    SharedModule,
   ],
   controllers: [AppController],
   providers: [AppService],

@@ -16,4 +16,7 @@ export class RomEntity {
 
     @Column({nullable: true})
     name?: string;
+
+    @Column({nullable: true})
+    fileName?: string;
 }

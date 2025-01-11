@@ -5,6 +5,7 @@ import {BullModule} from "@nestjs/bullmq";
 import {RomConsumer} from "./rom.consumer";
 import {RomEntity} from "./rom.entity";
 import {TypeOrmModule} from "@nestjs/typeorm";
+import {SharedModule} from "../shared/shared.module";
 
 @Module({
   imports: [
@@ -12,6 +13,7 @@ import {TypeOrmModule} from "@nestjs/typeorm";
     BullModule.registerQueue({
       name: 'download',
     }),
+      SharedModule,
   ],
   controllers: [
       RomController,

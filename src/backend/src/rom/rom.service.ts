@@ -2,12 +2,12 @@ import {Injectable, Logger} from '@nestjs/common';
 import {Queue} from "bullmq";
 import {InjectQueue} from "@nestjs/bullmq";
 import puppeteer, {Browser, CDPSession, Page} from "puppeteer";
-import * as path from "path";
 import {RomEntity} from "./rom.entity";
 import {InjectRepository} from "@nestjs/typeorm";
 import {Repository} from "typeorm";
 import {WebSocketGateway, WebSocketServer} from "@nestjs/websockets";
 import { Server } from 'socket.io';
+import {UtilsService} from "../shared/utils/utils.service";
 
 enum WsOperation {
     New = 'new',
@@ -24,7 +24,12 @@ export class RomService {
     constructor(
         @InjectRepository(RomEntity) private repository: Repository<RomEntity>,
         @InjectQueue('download') private downloadQueue: Queue,
+        private readonly utilsService: UtilsService,
     ) {}
+
+    get(id: number): Promise<RomEntity> {
+        return this.repository.findOne({where: {id}});
+    }
 
     getAll(): Promise<RomEntity[]> {
         return this.repository.find();
@@ -37,6 +42,14 @@ export class RomService {
         this.io.emit(WsOperation.Delete, { id });
     }
 
+    async retry(id: number): Promise<void> {
+        // TODO
+        /*const rom = await this.repository.findOne({where: {id}});
+        const job = await this.downloadQueue.getJob(this.getJobId(rom.id));
+        job?.cancel();
+        await this.downloadQueue.add('download', rom, {jobId: this.getJobId(rom.id)});*/
+    }
+
     async create(url: string): Promise<void> {
         const savedRom = await this.repository.save({url});
         await this.downloadQueue.add('download', savedRom, {jobId: this.getJobId(savedRom.id)});
@@ -46,6 +59,11 @@ export class RomService {
     async update(id: number, rom: RomEntity): Promise<void> {
         await this.repository.update(id, rom);
         this.io.emit(WsOperation.Update, rom);
+    }
+
+    async updatePartial(id: number, partialRom: Partial<RomEntity>): Promise<void> {
+        const dbRom = await this.get(id);
+        await this.update(id, {...dbRom, ...partialRom});
     }
 
     async download(rom: RomEntity): Promise<void> {
@@ -64,8 +82,9 @@ export class RomService {
             // Set download behavior
             await client.send('Page.setDownloadBehavior', {
                 behavior: 'allow',
-                downloadPath: path.resolve(__dirname, 'downloads')
+                downloadPath: this.utilsService.getDownloadFolderPath(),
             });
+            console.log(this.utilsService.getDownloadFolderPath());
             this.logger.debug(`Go to ${rom.url}`);
             await page.goto(rom.url);
         } catch (error) {
@@ -80,19 +99,23 @@ export class RomService {
         //Get meta data
         const name = await page.evaluate('document.querySelector("meta[property=\'og:title\']").getAttribute("content")') as string;
         this.logger.debug(`Name of rom is ${name}`)
-        const updatedRom = {...rom, name};
-        await this.update(rom.id, updatedRom);
+        await this.updatePartial(rom.id, {name});
         // Click download button
         await page.click('#dl_form button');
         this.logger.debug(`Download clicked`);
         try {
-                await page.click('input[value="Continue"]');
+            await Promise.any([
+                page.click('input[value="Continue"]'),
+                (page as any)._client().on('Page.downloadWillBegin', async ({suggestedFilename}) => {
+                    await this.updatePartial(rom.id, {fileName: suggestedFilename});
+                })
+            ]);
         } catch(e) {
-            this.logger.debug(`Prompt button not found`);
+            this.logger.debug(`Prompt button not found, but also not download`);
         }
         // Monitor download progress
         try {
-            await this.waitForDownload((page as any)._client(), updatedRom);
+            await this.waitForDownload((page as any)._client(), rom.id);
         } catch (e) {
             // pass
         } finally {
@@ -101,12 +124,14 @@ export class RomService {
         }
     }
 
-    private waitForDownload(client: CDPSession, rom: RomEntity): Promise<void> {
+    private waitForDownload(client: CDPSession, romId: number): Promise<void> {
         return new Promise((resolve, reject) => {
             client.on('Page.downloadProgress', async (event) => {
-                await this.update(rom.id, {...rom, totalBytes: event.totalBytes, receivedBytes: event.receivedBytes});
+                await this.updatePartial(romId, {totalBytes: event.totalBytes, receivedBytes: event.receivedBytes});
                 this.logger.debug((event.receivedBytes * 100) / event.totalBytes);
                 if (event.state === 'completed') {
+                    this.logger.debug(event);
+                    await this.updatePartial(romId, {totalBytes: event.totalBytes, receivedBytes: event.totalBytes});
                     resolve();
                 } else if (event.state === 'canceled') {
                     reject();
