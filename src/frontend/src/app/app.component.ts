@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
-import {RomService} from './services/rom.service';
+import {Rom, RomService} from './services/rom.service';
 import {FormsModule} from '@angular/forms';
 import {Observable} from 'rxjs';
 import {CommonModule, NgFor} from '@angular/common';
@@ -10,11 +10,12 @@ import {RomComponent} from './rom/rom.component';
   selector: 'app-root',
   imports: [RouterOutlet, CommonModule, FormsModule, RomComponent],
   templateUrl: './app.component.html',
+  standalone: true,
   styleUrl: './app.component.scss'
 })
 export class AppComponent {
   url = '';
-  all$: Observable<any[]>; // todo fix type
+  all$: Observable<Rom[]>;
 
   constructor(private romService: RomService) {
     this.romService.fetch();
@@ -34,7 +35,7 @@ export class AppComponent {
     this.romService.retry(id);
   }
 
-  trackByFn(_: number, item: any): number {
+  trackByFn(_: number, item: Rom): number {
     return item.id;
   }
 

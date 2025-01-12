@@ -11,7 +11,14 @@ import {HttpClient} from '@angular/common/http';
 import {Socket} from 'ngx-socket-io';
 import {tap} from 'rxjs';
 
-type Rom = any;
+export interface Rom {
+  id: number;
+  url: string;
+  totalBytes?: number;
+  receivedBytes?: number;
+  name?: string;
+  fileName?: string;
+}
 
 const STORE_NAME = 'rom';
 const ENDPOINT = '/api/rom';
@@ -28,7 +35,7 @@ export class RomService {
 
   private store = createStore(
     { name: STORE_NAME },
-    withEntities<Rom>(), // todo type
+    withEntities<Rom>(),
   );
 
   all$ = this.store.pipe(selectAllEntities());
