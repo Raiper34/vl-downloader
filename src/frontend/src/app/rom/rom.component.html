@@ -27,7 +27,7 @@
 
     <div class="content">
       {{ rom.receivedBytes | filesize }} / {{ rom.totalBytes | filesize }}
-      <progress class="progress is-danger" [value]="percentage" max="100">{{ percentage }}%</progress>
+      <progress class="progress" [ngClass]="rom.receivedBytes === rom.totalBytes ? 'is-success' : 'is-danger'" [value]="percentage" max="100">{{ percentage }}%</progress>
     </div>
   </div>
 </div>

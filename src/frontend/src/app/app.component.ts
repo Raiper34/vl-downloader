@@ -37,4 +37,8 @@ export class AppComponent {
   trackByFn(_: number, item: any): number {
     return item.id;
   }
+
+  deleteCompleted(): void {
+    this.romService.deleteCompleted();
+  }
 }

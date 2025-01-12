@@ -1,6 +1,12 @@
 import { Injectable } from '@angular/core';
 import {createStore} from '@ngneat/elf';
-import {deleteEntities, selectAllEntities, upsertEntities, withEntities} from '@ngneat/elf-entities';
+import {
+  deleteEntities,
+  selectAllEntities,
+  selectManyByPredicate,
+  upsertEntities,
+  withEntities
+} from '@ngneat/elf-entities';
 import {HttpClient} from '@angular/common/http';
 import {Socket} from 'ngx-socket-io';
 import {tap} from 'rxjs';
@@ -26,6 +32,7 @@ export class RomService {
   );
 
   all$ = this.store.pipe(selectAllEntities());
+  finished$ = this.store.pipe(selectManyByPredicate(rom => rom.receivedBytes !== 0 && rom.receivedBytes === rom.totalBytes));
 
   constructor(
     private readonly http: HttpClient,
@@ -50,6 +57,10 @@ export class RomService {
 
   retry(id: number): void {
     this.http.get(`${ENDPOINT}/retry/${id}`).subscribe();
+  }
+
+  deleteCompleted(): void {
+    this.finished$.pipe(tap(finished => finished.forEach(item => this.delete(item.id)))).subscribe();
   }
 
   private initWsConnection(): void {
