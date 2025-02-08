@@ -19,4 +19,7 @@ export class RomEntity {
 
     @Column({nullable: true})
     fileName?: string;
+
+    @Column({nullable: true})
+    error?: string;
 }

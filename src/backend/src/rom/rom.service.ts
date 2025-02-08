@@ -72,7 +72,11 @@ export class RomService {
         if (!(await this.get(rom.id))) {
             return;
         }
-        return this.downloadService.download(rom, this.utilsService.getDownloadFolderPath(), (val: Partial<RomEntity>) => this.updatePartial(rom.id, val));
+        try {
+            return this.downloadService.download(rom, this.utilsService.getDownloadFolderPath(), (val: Partial<RomEntity>) => this.updatePartial(rom.id, val));
+        } catch (error) {
+            await this.updatePartial(rom.id, {error: String(error)});
+        }
     }
 
     private getJobId(id: number): string {

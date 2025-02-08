@@ -18,6 +18,7 @@ export interface Rom {
   receivedBytes?: number;
   name?: string;
   fileName?: string;
+  error?: string;
 }
 
 const STORE_NAME = 'rom';

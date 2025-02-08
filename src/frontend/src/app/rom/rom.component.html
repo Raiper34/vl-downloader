@@ -2,7 +2,9 @@
   <div class="card-content">
     <div class="media">
       <div class="media-content is-flex is-justify-content-space-between">
-        <p class="title is-4">{{ rom.name ?? rom.url }}</p>
+        <p class="title is-4">
+          {{ rom.name ?? rom.url }}
+        </p>
         <div class="subtitle is-6">
 
           <div class="dropdown is-hoverable is-right">
@@ -26,8 +28,16 @@
     </div>
 
     <div class="content">
-      {{ (rom.receivedBytes || 0) | filesize }} / {{ (rom.totalBytes || 0) | filesize }}
-      <progress class="progress" [ngClass]="rom.receivedBytes === rom.totalBytes ? 'is-success' : 'is-danger'" [value]="percentage" max="100">{{ percentage }}%</progress>
+      <ng-container *ngIf="!rom.error; else errorTemplate">
+        {{ (rom.receivedBytes || 0) | filesize }} / {{ (rom.totalBytes || 0) | filesize }}
+        <progress class="progress" [ngClass]="rom.receivedBytes === rom.totalBytes ? 'is-success' : 'is-danger'" [value]="percentage" max="100">{{ percentage }}%</progress>
+      </ng-container>
     </div>
+    <ng-template #errorTemplate>
+      <div class="notification is-danger">
+        <i class="fa-solid fa-circle-exclamation">  </i>
+        Error: {{rom.error}}
+      </div>
+    </ng-template>
   </div>
 </div>

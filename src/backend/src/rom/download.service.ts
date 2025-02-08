@@ -55,6 +55,7 @@ export class DownloadService {
             await page.goto(rom.url);
         } catch (error) {
             this.logger.error(error);
+            throw error;
         }
         // Allow cookies
         try {
@@ -78,8 +79,9 @@ export class DownloadService {
                     await updateFn({fileName: suggestedFilename});
                 })
             ]);
-        } catch(e) {
+        } catch(error) {
             this.logger.debug(`Prompt button not found, but also not download`);
+            throw error;
         }
         // Monitor download progress
         try {
@@ -87,8 +89,8 @@ export class DownloadService {
                 this.waitForDownload((page as any)._client(), updateFn),
                 this.cancelDownloading(rom.id),
             ]);
-        } catch (e) {
-            // pass
+        } catch (error) {
+            throw error;
         } finally {
             // Wait for some time to ensure download starts
             this.eventEmitter.removeListener(`cancel.${rom.id}`, closeBrowserFn);
