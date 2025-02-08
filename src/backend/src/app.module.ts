@@ -10,10 +10,12 @@ import {ConfigModule, ConfigService} from "@nestjs/config";
 import {EnvironmentEnum} from "../environment.enum";
 import {ServeStaticModule} from "@nestjs/serve-static";
 import { SharedModule } from './shared/shared.module';
+import {EventEmitterModule} from "@nestjs/event-emitter";
 
 @Module({
   imports: [
     ConfigModule.forRoot(),
+    EventEmitterModule.forRoot(),
     BullModule.forRootAsync({
       imports: [ConfigModule],
       useFactory: async (configService: ConfigService) => ({
