@@ -1,14 +1,14 @@
 import {Injectable, Logger} from '@nestjs/common';
 import {Queue} from "bullmq";
 import {InjectQueue} from "@nestjs/bullmq";
-import {RomEntity} from "./rom.entity";
+import {RomEntity, TrackStatusEnum} from "./rom.entity";
 import {InjectRepository} from "@nestjs/typeorm";
 import {Repository} from "typeorm";
 import {WebSocketGateway, WebSocketServer} from "@nestjs/websockets";
-import { Server } from 'socket.io';
-import {UtilsService} from "../shared/utils/utils.service";
+import {Server} from 'socket.io';
+import {UtilsService} from "../shared/services/utils.service";
 import {EventEmitter2} from "@nestjs/event-emitter";
-import {DownloadService} from "./download.service";
+import {DownloadService} from "../shared/services/download.service";
 
 enum WsOperation {
     New = 'new',
@@ -40,7 +40,7 @@ export class RomService {
 
     async remove(id: number): Promise<void> {
         await this.repository.delete(id);
-        this.eventEmitter.emit(`cancel.${id}`)
+        this.eventEmitter.emit(this.getEventName(id))
         this.io.emit(WsOperation.Delete, { id });
     }
 
@@ -65,21 +65,30 @@ export class RomService {
 
     async updatePartial(id: number, partialRom: Partial<RomEntity>): Promise<void> {
         const dbRom = await this.get(id);
-        await this.update(id, {...dbRom, ...partialRom});
+        if (dbRom) {
+            await this.update(id, {...dbRom, ...partialRom});
+        }
     }
 
     async download(rom: RomEntity): Promise<void> {
-        if (!(await this.get(rom.id))) {
-            return;
-        }
-        try {
-            return this.downloadService.download(rom, this.utilsService.getDownloadFolderPath(), (val: Partial<RomEntity>) => this.updatePartial(rom.id, val));
-        } catch (error) {
-            await this.updatePartial(rom.id, {error: String(error)});
+        if (await this.get(rom.id)) {
+            await this.updatePartial(rom.id, {status: TrackStatusEnum.Downloading});
+            try {
+                await this.downloadService.download(rom.url, this.getEventName(rom.id), this.utilsService.getDownloadFolderPath(), (val: Partial<RomEntity>) =>
+                    this.updatePartial(rom.id, val)
+                );
+            } catch (error) {
+                await this.updatePartial(rom.id, {error: String(error), status: TrackStatusEnum.Error});
+            }
+            await this.updatePartial(rom.id, {status: TrackStatusEnum.Completed});
         }
     }
 
     private getJobId(id: number): string {
         return `id-${id}`;
+    }
+
+    private getEventName(id: number): string {
+        return `cancel.${id}`
     }
 }

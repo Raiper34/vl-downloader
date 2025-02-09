@@ -6,7 +6,6 @@ import {RomConsumer} from "./rom.consumer";
 import {RomEntity} from "./rom.entity";
 import {TypeOrmModule} from "@nestjs/typeorm";
 import {SharedModule} from "../shared/shared.module";
-import { DownloadService } from './download.service';
 
 @Module({
   imports: [
@@ -19,6 +18,6 @@ import { DownloadService } from './download.service';
   controllers: [
       RomController,
   ],
-  providers: [RomService, RomConsumer, DownloadService]
+  providers: [RomService, RomConsumer]
 })
 export class RomModule {}

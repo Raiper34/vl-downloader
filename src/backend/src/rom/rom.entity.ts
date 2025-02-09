@@ -1,5 +1,12 @@
 import {Column, Entity, PrimaryGeneratedColumn} from "typeorm";
 
+export enum TrackStatusEnum {
+    Queued,
+    Downloading,
+    Completed,
+    Error,
+}
+
 @Entity()
 export class RomEntity {
     @PrimaryGeneratedColumn()
@@ -22,4 +29,7 @@ export class RomEntity {
 
     @Column({nullable: true})
     error?: string;
+
+    @Column({ default: TrackStatusEnum.Queued })
+    status: TrackStatusEnum;
 }

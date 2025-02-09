@@ -1,5 +1,5 @@
 import {Injectable, Logger} from '@nestjs/common';
-import {RomEntity} from "./rom.entity";
+import {RomEntity} from "../../rom/rom.entity";
 import puppeteer, {Browser, CDPSession, Page} from "puppeteer";
 import {EventEmitter2} from "@nestjs/event-emitter";
 
@@ -35,14 +35,14 @@ export class DownloadService {
         private readonly eventEmitter: EventEmitter2
     ) { }
 
-    async download(rom: RomEntity, downloadPath: string, updateFn: (val: Partial<RomEntity>) => Promise<void>): Promise<void> {
+    async download(romUrl: string, eventName: string, downloadPath: string, updateFn: (val: Partial<RomEntity>) => Promise<void>): Promise<void> {
         let browser: Browser;
         let page: Page;
         const closeBrowserFn = async () => {
             browser && await browser.close();
             this.logger.debug('Browser closed before downloading');
         }
-        this.eventEmitter.once(`cancel.${rom.id}`, closeBrowserFn);
+        this.eventEmitter.once(eventName, closeBrowserFn);
         try {
             this.logger.debug(`Starting Chrome`);
             browser = await puppeteer.launch(PUPPETEER_SETTINGS);
@@ -51,8 +51,8 @@ export class DownloadService {
             const client = await page.target().createCDPSession();
             // Set download behavior
             await client.send(PuppeteerEvents.SetDownloadBehavior, {behavior: 'allow', downloadPath});
-            this.logger.debug(`Go to ${rom.url}`);
-            await page.goto(rom.url);
+            this.logger.debug(`Go to ${romUrl}`);
+            await page.goto(romUrl);
         } catch (error) {
             this.logger.error(error);
             throw error;
@@ -87,13 +87,13 @@ export class DownloadService {
         try {
             await Promise.any([
                 this.waitForDownload((page as any)._client(), updateFn),
-                this.cancelDownloading(rom.id),
+                this.cancelDownloading(eventName),
             ]);
         } catch (error) {
             throw error;
         } finally {
             // Wait for some time to ensure download starts
-            this.eventEmitter.removeListener(`cancel.${rom.id}`, closeBrowserFn);
+            this.eventEmitter.removeListener(eventName, closeBrowserFn);
             browser && await browser.close();
             this.logger.debug('Browser closed');
         }
@@ -115,9 +115,7 @@ export class DownloadService {
         });
     }
 
-    private cancelDownloading(romId: number): Promise<void> {
-        return new Promise((resolve) => {
-            this.eventEmitter.once(`cancel.${romId}`, resolve);
-        });
+    private cancelDownloading(eventName: string): Promise<void> {
+        return new Promise((resolve) => this.eventEmitter.once(eventName, resolve));
     }
 }

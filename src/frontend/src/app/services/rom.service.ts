@@ -11,9 +11,17 @@ import {HttpClient} from '@angular/common/http';
 import {Socket} from 'ngx-socket-io';
 import {tap} from 'rxjs';
 
+export enum TrackStatusEnum {
+  Queued,
+  Downloading,
+  Completed,
+  Error,
+}
+
 export interface Rom {
   id: number;
   url: string;
+  status: TrackStatusEnum,
   totalBytes?: number;
   receivedBytes?: number;
   name?: string;

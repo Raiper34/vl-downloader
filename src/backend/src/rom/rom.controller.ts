@@ -1,7 +1,7 @@
 import {Body, Controller, Delete, Get, Param, Post, Res, StreamableFile} from '@nestjs/common';
 import {RomService} from "./rom.service";
 import {RomEntity} from "./rom.entity";
-import {UtilsService} from "../shared/utils/utils.service";
+import {UtilsService} from "../shared/services/utils.service";
 import { createReadStream } from 'fs';
 import type { Response } from 'express';
 

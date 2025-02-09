@@ -3,6 +3,7 @@
     <div class="media">
       <div class="media-content is-flex is-justify-content-space-between">
         <p class="title is-4">
+          <i *ngIf="rom.status === trackStatusEnum.Queued" class="fa-solid fa-clock has-text-info" title="Queued"></i>
           {{ rom.name ?? rom.url }}
         </p>
         <div class="subtitle is-6">
@@ -16,8 +17,8 @@
             <div class="dropdown-menu" id="dropdown-menu4" role="menu">
               <div class="dropdown-content">
                 <a *ngIf="rom.url" [href]="rom.url" target="_blank" class="dropdown-item"><i class="fa-solid fa-link"></i> Original link</a>
-                <a *ngIf="isCompleted" href="api/rom/download/{{rom.id}}" class="dropdown-item" download><i class="fa-solid fa-download"></i> Download file</a>
-                <a href="#" target="_blank" class="dropdown-item" (click)="$event.preventDefault(); retry.emit(this.rom.id)"><i class="fa-solid fa-repeat"></i> Retry job</a>
+                <a *ngIf="rom.status === trackStatusEnum.Completed" href="api/rom/download/{{rom.id}}" class="dropdown-item" download><i class="fa-solid fa-download"></i> Download file</a>
+                <a *ngIf="rom.status === trackStatusEnum.Error" href="#" target="_blank" class="dropdown-item" (click)="$event.preventDefault(); retry.emit(this.rom.id)"><i class="fa-solid fa-repeat"></i> Retry job</a>
                 <a href="#" target="_blank" class="dropdown-item has-text-danger" (click)="$event.preventDefault(); remove.emit(this.rom.id)"><i class="fa-solid fa-trash"></i> Remove job</a>
               </div>
             </div>
@@ -28,16 +29,21 @@
     </div>
 
     <div class="content">
-      <ng-container *ngIf="!rom.error; else errorTemplate">
+      <ng-container *ngIf="rom.status === trackStatusEnum.Downloading || rom.status === trackStatusEnum.Completed">
         {{ (rom.receivedBytes || 0) | filesize }} / {{ (rom.totalBytes || 0) | filesize }}
-        <progress class="progress" [ngClass]="rom.receivedBytes === rom.totalBytes ? 'is-success' : 'is-danger'" [value]="percentage" max="100">{{ percentage }}%</progress>
+        <progress class="progress"
+                  [ngClass]="rom.status === trackStatusEnum.Completed ? 'is-success' : 'is-danger'"
+                  [value]="percentage"
+                  max="100">
+          {{ percentage }}%
+        </progress>
       </ng-container>
-    </div>
-    <ng-template #errorTemplate>
+    <ng-container *ngIf="rom.status === trackStatusEnum.Error">
       <div class="notification is-danger">
         <i class="fa-solid fa-circle-exclamation">  </i>
         Error: {{rom.error}}
       </div>
-    </ng-template>
+    </ng-container>
+    </div>
   </div>
 </div>
