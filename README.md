@@ -1,3 +1,4 @@
+![spooty logo](assets/logo.svg)
 # VL Downloader
 
 ```bash
