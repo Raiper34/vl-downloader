@@ -45,11 +45,9 @@ export class RomService {
     }
 
     async retry(id: number): Promise<void> {
-        // TODO
-        /*const rom = await this.repository.findOne({where: {id}});
-        const job = await this.downloadQueue.getJob(this.getJobId(rom.id));
-        job?.cancel();
-        await this.downloadQueue.add('download', rom, {jobId: this.getJobId(rom.id)});*/
+        const rom = await this.get(id);
+        await this.remove(rom.id);
+        await this.create(rom.url);
     }
 
     async create(url: string): Promise<void> {

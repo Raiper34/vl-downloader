@@ -18,7 +18,7 @@
               <div class="dropdown-content">
                 <a *ngIf="rom.url" [href]="rom.url" target="_blank" class="dropdown-item"><i class="fa-solid fa-link"></i> Original link</a>
                 <a *ngIf="rom.status === trackStatusEnum.Completed" href="api/rom/download/{{rom.id}}" class="dropdown-item" download><i class="fa-solid fa-download"></i> Download file</a>
-                <a *ngIf="rom.status === trackStatusEnum.Error" href="#" target="_blank" class="dropdown-item" (click)="$event.preventDefault(); retry.emit(this.rom.id)"><i class="fa-solid fa-repeat"></i> Retry job</a>
+                <a href="#" target="_blank" class="dropdown-item" (click)="$event.preventDefault(); retry.emit(this.rom.id)"><i class="fa-solid fa-repeat"></i> Retry job</a>
                 <a href="#" target="_blank" class="dropdown-item has-text-danger" (click)="$event.preventDefault(); remove.emit(this.rom.id)"><i class="fa-solid fa-trash"></i> Remove job</a>
               </div>
             </div>
