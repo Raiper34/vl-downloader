@@ -48,7 +48,8 @@ export class RomService {
   );
 
   all$ = this.store.pipe(selectAllEntities());
-  finished$ = this.store.pipe(selectManyByPredicate(rom => rom.receivedBytes !== 0 && rom.receivedBytes === rom.totalBytes));
+  finished$ = this.store.pipe(selectManyByPredicate(rom => rom.status === TrackStatusEnum.Completed));
+  failed$ = this.store.pipe(selectManyByPredicate(rom => rom.status === TrackStatusEnum.Error));
 
   constructor(
     private readonly http: HttpClient,
@@ -77,6 +78,10 @@ export class RomService {
 
   deleteCompleted(): void {
     this.finished$.pipe(tap(finished => finished.forEach(item => this.delete(item.id)))).subscribe();
+  }
+
+  deleteFailed(): void {
+    this.failed$.pipe(tap(failed => failed.forEach(item => this.delete(item.id)))).subscribe();
   }
 
   private initWsConnection(): void {

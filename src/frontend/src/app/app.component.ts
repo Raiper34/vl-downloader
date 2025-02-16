@@ -42,4 +42,8 @@ export class AppComponent {
   deleteCompleted(): void {
     this.romService.deleteCompleted();
   }
+
+  deleteFailed(): void {
+    this.romService.deleteFailed();
+  }
 }
