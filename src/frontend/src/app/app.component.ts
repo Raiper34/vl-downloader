@@ -1,20 +1,23 @@
 import { Component } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import {Rom, RomService} from './services/rom.service';
-import {FormsModule} from '@angular/forms';
+import {FormControl, FormsModule, ReactiveFormsModule, Validators} from '@angular/forms';
 import {Observable} from 'rxjs';
 import {CommonModule, NgFor} from '@angular/common';
 import {RomComponent} from './rom/rom.component';
 
+const REGEXP_URL = /^https:\/\/vimm\.net\/vault\/\d+$/;
+
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet, CommonModule, FormsModule, RomComponent],
+  imports: [RouterOutlet, CommonModule, FormsModule, ReactiveFormsModule, RomComponent],
   templateUrl: './app.component.html',
   standalone: true,
   styleUrl: './app.component.scss'
 })
 export class AppComponent {
   url = '';
+  form = new FormControl('', {validators: [Validators.required, Validators.pattern(REGEXP_URL)]});
   all$: Observable<Rom[]>;
 
   constructor(private romService: RomService) {

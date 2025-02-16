@@ -12,8 +12,13 @@
   <div class="hero-body">
     <p class="subtitle">Download</p>
     <div class="is-flex">
-      <input class="input" type="text" placeholder="Paste url to rom" [(ngModel)]="url"/>
-      <button class="button is-danger" (click)="processUrl()">
+      <input class="input"
+             [class.is-danger]="form.invalid && form.dirty"
+             type="text"
+             placeholder="Paste url to rom"
+             [formControl]="form"
+             [title]="form.invalid && form.dirty ? 'Url needs to start with https://vimm.net/vault/' : ''"/>
+      <button class="button is-danger" (click)="processUrl()" [disabled]="form.invalid" [title]="form.invalid ? 'Url needs to start with https://vimm.net/vault/' : ''">
         <i class="fa-solid fa-download"></i> Download
       </button>
     </div>
