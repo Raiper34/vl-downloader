@@ -105,11 +105,11 @@ export class DownloadService {
                 await updateFn({totalBytes: event.totalBytes, receivedBytes: event.receivedBytes});
                 this.logger.debug((event.receivedBytes * 100) / event.totalBytes);
                 if (event.state === PuppeteerDownloadingState.Completed) {
-                    this.logger.debug(event);
+                    this.logger.debug('Completed');
                     await updateFn({totalBytes: event.totalBytes, receivedBytes: event.totalBytes});
                     resolve();
                 } else if (event.state === PuppeteerDownloadingState.Canceled) {
-                    reject();
+                    reject('Canceled');
                 }
             });
         });

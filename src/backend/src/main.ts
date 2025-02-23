@@ -14,7 +14,7 @@ bootstrap();
 if (!process.env.DOWNLOADS_PATH) {
   throw new Error('DOWNLOADS_PATH environment variable is missing');
 }
-const folderName = resolve(__dirname, '../..', process.env.DOWNLOADS_PATH);
+const folderName = resolve(__dirname, '..', process.env.DOWNLOADS_PATH);
 !fs.existsSync(folderName) && fs.mkdirSync(folderName);
 try {
   // not good idea, but I want to keep simple Dockerfile, I know ideally should be in another container and used docker compose

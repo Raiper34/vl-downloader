@@ -32,7 +32,7 @@ import {EventEmitterModule} from "@nestjs/event-emitter";
         type: 'sqlite',
         database: resolve(
             __dirname,
-            '../..',
+            '..',
             configService.get<string>(EnvironmentEnum.DB_PATH),
         ),
         entities: [RomEntity],

@@ -16,7 +16,7 @@ const REGEXP_URL = /^https:\/\/vimm\.net\/vault\/\d+$/;
   styleUrl: './app.component.scss'
 })
 export class AppComponent {
-  url = '';
+
   form = new FormControl('', {validators: [Validators.required, Validators.pattern(REGEXP_URL)]});
   all$: Observable<Rom[]>;
 
@@ -26,8 +26,8 @@ export class AppComponent {
   }
 
   processUrl(): void {
-    this.romService.processUrl(this.url);
-    this.url = '';
+    this.romService.processUrl(this.form.value!);
+    this.form.reset();
   }
 
   remove(id: number): void {
